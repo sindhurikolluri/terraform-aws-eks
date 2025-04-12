@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "expense-infra"
-    key    = "expense-infra-sg" # you should have unique keys with in the bucket, same key should not be used in other repos or tf projects
+    key    = "expense-eks-sg" # you should have unique keys with in the bucket, same key should not be used in other repos or tf projects
     region = "us-east-1"
     dynamodb_table = "expense-infra"
   }
