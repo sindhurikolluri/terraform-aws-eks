@@ -9,8 +9,6 @@ module "mysql_sg" {
     common_tags = var.common_tags
 }
 
-
-
 module "bastion_sg" {
     source = "git::https://github.com/sindhurikolluri/terraform-aws-security-group-module.git?ref=main"
     project_name = var.project_name
@@ -62,6 +60,7 @@ module "eks_node_sg" {
     common_tags = var.common_tags
 }
 
+#eks control plane accepting from eks node
 resource "aws_security_group_rule" "eks_control_plane_node" {
   type              = "ingress"
   from_port         = 0
@@ -71,6 +70,7 @@ resource "aws_security_group_rule" "eks_control_plane_node" {
   security_group_id = module.eks_control_plane_sg.sg_id
 }
 
+#node accepting all traffic from control plane
 resource "aws_security_group_rule" "eks_node_eks_control_plane" {
   type              = "ingress"
   from_port         = 0
@@ -80,6 +80,7 @@ resource "aws_security_group_rule" "eks_node_eks_control_plane" {
   security_group_id = module.eks_node_sg.sg_id
 }
 
+#nodes accepting traffic from ingress alb in ephemeral range
 resource "aws_security_group_rule" "node_alb_ingress" {
   type              = "ingress"
   from_port         = 30000
@@ -89,6 +90,7 @@ resource "aws_security_group_rule" "node_alb_ingress" {
   security_group_id = module.eks_node_sg.sg_id
 }
 
+#worker nodes are accpeting traffic from vpc_cidr
 resource "aws_security_group_rule" "node_vpc" {
   type              = "ingress"
   from_port         = 0
@@ -98,6 +100,7 @@ resource "aws_security_group_rule" "node_vpc" {
   security_group_id = module.eks_node_sg.sg_id
 }
 
+#node accpeting traffic from bastion on port 22
 resource "aws_security_group_rule" "node_bastion" {
   type              = "ingress"
   from_port         = 22
@@ -145,7 +148,7 @@ resource "aws_security_group_rule" "bastion_public" {
   security_group_id = module.bastion_sg.sg_id
 }
 
-
+#mysql accepting traffic from bastion
 resource "aws_security_group_rule" "mysql_bastion" {
   type              = "ingress"
   from_port         = 3306
@@ -155,6 +158,7 @@ resource "aws_security_group_rule" "mysql_bastion" {
   security_group_id = module.mysql_sg.sg_id
 }
 
+#mysql accepting traffic from eks nodes
 resource "aws_security_group_rule" "mysql_eks_node" {
   type              = "ingress"
   from_port         = 3306
